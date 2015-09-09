@@ -11,10 +11,5 @@ rlbench
 
 Benchmarks for reinforcement learning algorithms.
 
-* Free software: BSD license
+
 * Documentation: https://rlbench.readthedocs.org.
-
-Features
---------
-
-* TODO
