@@ -66,6 +66,8 @@ docs:
 	sphinx-apidoc -o docs/ rlbench
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
+	
+view-docs:
 	$(BROWSER) docs/_build/html/index.html
 
 release: clean

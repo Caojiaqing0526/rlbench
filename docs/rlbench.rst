@@ -4,6 +4,30 @@ rlbench package
 Submodules
 ----------
 
+rlbench.agent module
+--------------------
+
+.. automodule:: rlbench.agent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+rlbench.benchmark module
+------------------------
+
+.. automodule:: rlbench.benchmark
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+rlbench.environment module
+--------------------------
+
+.. automodule:: rlbench.environment
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 rlbench.rlbench module
 ----------------------
 
