@@ -1,11 +1,38 @@
-import numpy
+import numpy as np
 
 
-class Environment:
+# Provide a means of registering available environments
+environment_registry = {}
+
+
+class MetaEnvironment(type):
+    def __new__(meta, name, bases, dct):
+        """Perform actions/make changes upon class definition."""
+        # Create the class
+        cls = type.__new__(meta, name, bases, attrs)
+
+        # Don't touch base classes
+        if bases != (object,):
+            environment_registry['name'] = cls
+        return cls 
+
+
+class Environment(object, metaclass=MetaEnvironment):
     """Abstract base class for a discrete environment in the RL framework."""
     def __init__(self, *args, **kwargs):
         pass
     
+    def observe(self, s=None):
+        """Get the available sensory information for a state (defaulting to the
+        current state if none is specified).
+
+        Args:
+            s: State to get sensory information about (default current state).
+        Returns:
+            The observation associated with the state.
+        """
+        return self.state 
+
     def do(self, action):
         """Execute an action in the environment.
 
@@ -40,7 +67,7 @@ class Environment:
         
         Args:
             s0: State to set the environment to. Defaults to the state the 
-            environment was in at initialization.
+                environment was in at initialization.
         """
         raise NotImplementedError
         
@@ -83,4 +110,4 @@ class Environment:
     @property
     def max_actions(self):
         """int: The maximum number of actions available over all states."""
-        pass
+        raise NotImplementedError
