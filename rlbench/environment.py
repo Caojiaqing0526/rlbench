@@ -6,7 +6,7 @@ environment_registry = {}
 
 
 class MetaEnvironment(type):
-    def __new__(meta, name, bases, dct):
+    def __new__(meta, name, bases, attrs):
         """Perform actions/make changes upon class definition."""
         # Create the class
         cls = type.__new__(meta, name, bases, attrs)
