@@ -69,7 +69,10 @@ class Environment(object, metaclass=MetaEnvironment):
             s0: State to set the environment to. Defaults to the state the 
                 environment was in at initialization.
         """
-        raise NotImplementedError
+        if s0 is None:
+            self._state = self.s0
+        else:
+            self._state = s0
         
     def is_terminal(self, s=None):
         """Return `True` if the environment is in a terminal state.
@@ -82,8 +85,7 @@ class Environment(object, metaclass=MetaEnvironment):
         """
         raise NotImplementedError
     
-    @property
-    def actions(self):
+    def actions(self, s=None):
         """Actions available (in the current state)."""
         raise NotImplementedError
         
@@ -95,19 +97,19 @@ class Environment(object, metaclass=MetaEnvironment):
     @property
     def states(self):
         """Set: The set of all states in the environment."""
-        return self.nonterminals + self.terminals
+        raise NotImplementedError
 
     @property 
     def nonterminals(self):
         """Set: The set of nonterminal states of the environment."""
-        raise NotImplementedError
+        return {s for s in self.states if not self.is_terminal(s)}
 
     @property 
     def terminals(self):
         """Set: The set of terminal states of the environment."""
-        raise NotImplementedError
+        return {s for s in self.states if self.is_terminal(s)}
 
     @property
     def max_actions(self):
         """int: The maximum number of actions available over all states."""
-        raise NotImplementedError
+        return max(len(self.actions(s)) for s in self.states)

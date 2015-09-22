@@ -4,7 +4,9 @@ import numpy as np
 class Agent:
     """Abstract base class for agents in the RL framework."""
     def __init__(self, *args, **kwargs):
-        pass
+        self.policy = kwargs.get('policy', None)
+        self.behavior = kwargs.get('behavior', None)
+
 
     def choose(self, s, actions):
         """ Select an action from possible actions in response to state `s`.
@@ -28,11 +30,12 @@ class Agent:
             sp: The new state, a result of action `a` in state `s`.
             **params: Any additional parameters needed to make the update. 
         """
+        pass
 
 
-class RandomAgent(Agent):
-    """An example agent, which takes an action at random from the set of 
-    available actions. """
-    def choose(self, state, actions):
-        """Randomly select from available actions, with equal probability."""
-        return np.random.choice(actions)
+class HordeAgent(Agent):
+    """ *Not Implemented*
+    A way of running multiple off policy agents a la Horde. 
+    """
+    def __init__(self, *args, **kwargs):
+        pass

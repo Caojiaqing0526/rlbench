@@ -22,7 +22,17 @@ class MetaAlgo(type):
 
 
 class Algo(object, metaclass=MetaAlgo):
+    """Update the agent from the experience it received.
+
+    Args:
+        s: The state at the beginning of the transition.
+        a: The action performed in state `s`.
+        r: The reward, a result of the transition (`s`, `a`, `sp`).
+        sp: The new state, a result of action `a` in state `s`.
+        **params: Any additional parameters needed to make the update. 
+    """
     pass
+
 
 class TD(Algo):
     def update(self, x, r, xp, alpha, gamma, lmbda):

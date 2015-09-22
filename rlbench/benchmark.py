@@ -12,6 +12,12 @@ import numpy as np
 # ... and all the while be logging.
 
 
+class PredictionExperiment:
+    def __init__(self, agent, environment, *args, **kwargs):
+        pass
+
+
+
 class ControlExperiment:
     def __init__(self, *args, **kwargs):
         pass
