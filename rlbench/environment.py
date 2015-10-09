@@ -85,8 +85,12 @@ class Environment(object, metaclass=MetaEnvironment):
         """
         raise NotImplementedError
     
-    def actions(self, s=None):
-        """Actions available (in the current state)."""
+    def get_actions(self, s=None):
+        """Actions available in state `s` (defaults to current state).
+
+        Returns:
+            actions (set): the actions available in state `s`.
+        """
         raise NotImplementedError
         
     @property
@@ -113,3 +117,7 @@ class Environment(object, metaclass=MetaEnvironment):
     def max_actions(self):
         """int: The maximum number of actions available over all states."""
         return max(len(self.actions(s)) for s in self.states)
+
+    @property 
+    def info(self):
+        """Return summary information about the environment."""

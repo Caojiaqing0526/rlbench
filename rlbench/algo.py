@@ -37,3 +37,7 @@ class Algo(object, metaclass=MetaAlgo):
 class TD(Algo):
     def update(self, x, r, xp, alpha, gamma, lmbda):
         pass
+
+class ETD(Algo):
+    def update(self, x, r, xp, alpha, gm, gm_p, lmbda, rho, interest):
+        self.e = rho*()

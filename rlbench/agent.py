@@ -34,8 +34,8 @@ class Agent:
 
 
 class HordeAgent(Agent):
-    """ *Not Implemented*
+    """
     A way of running multiple off policy agents a la Horde. 
     """
     def __init__(self, *args, **kwargs):
-        pass
+        raise(NotImplementedError)

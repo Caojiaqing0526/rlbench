@@ -12,6 +12,14 @@ rlbench.agent module
     :undoc-members:
     :show-inheritance:
 
+rlbench.algo module
+-------------------
+
+.. automodule:: rlbench.algo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 rlbench.benchmark module
 ------------------------
 
@@ -20,10 +28,42 @@ rlbench.benchmark module
     :undoc-members:
     :show-inheritance:
 
+rlbench.chicken module
+----------------------
+
+.. automodule:: rlbench.chicken
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 rlbench.environment module
 --------------------------
 
 .. automodule:: rlbench.environment
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+rlbench.grid_environment module
+-------------------------------
+
+.. automodule:: rlbench.grid_environment
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+rlbench.pachinko module
+-----------------------
+
+.. automodule:: rlbench.pachinko
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+rlbench.policy module
+---------------------
+
+.. automodule:: rlbench.policy
     :members:
     :undoc-members:
     :show-inheritance:

@@ -9,7 +9,7 @@ from environment import Environment
 # const in python?
 
 class Chicken(Environment):
-    ACTIONS = {0:'advance', 1:'reset'}
+    ACTIONS = {0:'advance', 1:'return'}
     def __init__(self, length):
         self.length = length
         self.s0 = 0
@@ -21,7 +21,7 @@ class Chicken(Environment):
         return {s for s in range(self.length+1)}
 
     def actions(self, s=None):
-        return {0, 1}
+        return (0, 1)
 
     def do(self, action):
         if self.is_terminal():
