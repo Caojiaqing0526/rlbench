@@ -25,9 +25,14 @@ class Policy:
         """
         raise NotImplementedError
 
+    def probabilities(self, s, actions):
+        """ Return the probability of selecting each action in state `s`."""
+        raise NotImplementedError 
+
     @property
     def info(self):
         """Summary information about the environment."""
+        return dict()
     
 
 
@@ -38,6 +43,9 @@ class RandomPolicy(Policy):
     def choose(self, s, actions):
         """Randomly select from available actions, with equal probability."""
         return np.random.choice(actions)
+
+    def probabilities(self, s, actions):
+        return np.ones(len(actions))/len(actions)
 
 
 class FixedPolicy(Policy):
@@ -57,6 +65,9 @@ class FixedPolicy(Policy):
 
     def choose(self, s, actions):
         return np.random.choice(actions, p=[self.pol[s][a] for a in actions])
+
+    def probabilities(self, s, actions):
+        return [self.pol[s][a] for a in actions]
 
 
 class ObliviousPolicy(Policy):

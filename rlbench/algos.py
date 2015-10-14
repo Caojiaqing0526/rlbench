@@ -35,8 +35,19 @@ class Algo(object, metaclass=MetaAlgo):
 
 
 class TD(Algo):
-    def update(self, x, r, xp, alpha, gamma, lmbda):
-        pass
+    def __init__(self, n, **kwargs):
+        # TODO: Documentation
+        self.n = n 
+        self.z = np.zeros(n)
+        self.theta = np.zeros(n)
+
+    def update(self, x, r, xp, alpha, gm, lm):
+        # TODO: Documentation
+        self.z = x + gm*lm*self.z
+        delta = r + gm*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        self.theta += alpha*delta*self.z 
+        
+
 
 class ETD(Algo):
     def update(self, x, r, xp, alpha, gm, gm_p, lmbda, rho, interest):

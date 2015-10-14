@@ -74,6 +74,11 @@ class Environment(object, metaclass=MetaEnvironment):
         else:
             self._state = s0
         
+    def is_episodic(self):
+        """Return `True` if the environment is episodic."""
+        return self.EPISODIC == True
+
+
     def is_terminal(self, s=None):
         """Return `True` if the environment is in a terminal state.
         

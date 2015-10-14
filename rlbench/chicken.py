@@ -5,11 +5,10 @@ game of "chicken".
 import numpy as np 
 from environment import Environment 
 
-# memoizing properties in python?
-# const in python?
 
 class Chicken(Environment):
-    ACTIONS = {0:'advance', 1:'return'}
+    ACTIONS = {'advance': 0, 'return': 1}
+    EPISODIC = False
     def __init__(self, length):
         self.length = length
         self.s0 = 0
@@ -20,7 +19,48 @@ class Chicken(Environment):
     def states(self):
         return {s for s in range(self.length+1)}
 
-    def actions(self, s=None):
+    def get_actions(self, s=None):
+        return (0, 1)
+
+    def do(self, action):
+        if action == 0:
+            if self._state == self.length - 1:
+                sp = self.s0
+            else:
+                sp = self._state + 1
+        elif action == 1:
+            sp = self.s0 
+        else:
+            raise Exception("Invalid action:", action)
+        # compute reward and set next state
+        r = self.rfunc(self.state, action, sp)
+        self._state = sp 
+        return r, sp 
+
+    def rfunc(self, s, a, sp):
+        if s == self.length - 1 and a == self.ACTIONS['advance']:
+            return 1
+        else:
+            return 0
+
+    def is_terminal(self, s=None):
+        return False
+
+
+class EpisodicChicken(Environment):
+    ACTIONS = {'advance': 0, 'return': 1}
+    EPISODIC = True
+    def __init__(self, length):
+        self.length = length
+        self.s0 = 0
+        self._terminals = {length,}
+        self.reset()
+
+    @property 
+    def states(self):
+        return {s for s in range(self.length+1)}
+
+    def get_actions(self, s=None):
         return (0, 1)
 
     def do(self, action):
