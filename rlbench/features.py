@@ -58,3 +58,32 @@ class Int2Binary:
     @property 
     def nout(self):
         return self.length
+
+
+class RandomBinary:
+    def __init__(self, length, num_active, terminals=None, random_seed=None):
+        if terminals is None:
+            self._terminals = set()
+        else:
+            self._terminals = set(terminals)
+        self.length = length
+        self.num_active = num_active
+        self.random_state = np.random.RandomState(random_seed)
+        self.mapping = {}
+
+    def __call__(self, x):
+        return self.mapping.setdefault(x, self.gen())
+
+    def gen(self):
+        # TODO: A better name for this
+        indices = np.arange(self.length)
+        nonzero = self.random_state.choice(indices, self.num_active, replace=False)
+        ret = np.zeros(self.length)
+        ret[nonzero] = 1
+        return ret
+
+    @property 
+    def terminals(self):
+        return self._terminals
+
+

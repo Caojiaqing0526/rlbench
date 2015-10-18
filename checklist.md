@@ -16,10 +16,17 @@
 
 # Features
 
+# Agents
+
+- [ ] Agents should be wrappers for `algos`, computing *parameters* and *features* for them as needed
+- [ ] Agent should also contain `policy` for the algorithm-- both the target and behavior policy; it should be responsible for choosing actions (and therefore also computing `rho`) 
+- [ ] These could be specified at initialization, or passed to the agent during `update`, overriding the previously specified values.
+
 # Algorithms
 
 - [ ] Need to eventually wrap `Algorithm` objects in `Agent` objects
 - [ ] Algorithm parameters should be ordered alphabetically, (perhaps defaulting to `None`?)
+- [ ] Do we have an idea of what parameters need to be specified per-timestep for all the algorithms we'll be testing? Having access to all of them will dramatically simplify testing multiple algorithms/agents at a time
 
 # Benchmarking
 
@@ -27,7 +34,7 @@
 
 - [ ] Basic data generation
 - [ ] Data format spec for reproducibility
-- [ ] 
+- [ ] **Where possible, initialize feature repn. at start!**
 
 ## Consistency
 

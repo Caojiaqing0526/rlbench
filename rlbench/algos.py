@@ -38,17 +38,71 @@ class TD(Algo):
     def __init__(self, n, **kwargs):
         # TODO: Documentation
         self.n = n 
-        self.z = np.zeros(n)
         self.theta = np.zeros(n)
+        self.reset()
 
-    def update(self, x, r, xp, alpha, gm, lm):
+    def reset(self):
+        self.z = np.zeros(self.n)
+        self.old_rho = 0
+
+    def update(self, x, r, xp, alpha, gm, lm, rho):
         # TODO: Documentation
-        self.z = x + gm*lm*self.z
-        delta = r + gm*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        # TODO: Compare updates from Geist 2014 vs. Precup, Sutton, & Singh 2000 
+        self.z = x + gm*lm*self.old_rho*self.z
+        delta = r + gm*rho*np.dot(self.theta, xp) - np.dot(self.theta, x)
         self.theta += alpha*delta*self.z 
+
+        # prepare for next iteration
+        self.old_rho = rho
         
 
+class LSTD(Algo):
+    def __init__(self, n, epsilon=1e-6, **kwargs):
+        self.n  = n                         # number of features
+        self.z  = np.zeros(n)               # traces 
+        self.A  = np.eye(n,n) * epsilon     # A^-1 . b = theta^*
+        self.b  = np.zeros(n) 
+        self.reset()
+
+    def reset(self):
+        self.z = np.zeros(self.n)
+        self.old_rho = 0
+
+    def update(self, x, r, xp, gm, lm, rho):
+        self.z = x + gm*lm*self.old_rho*self.z 
+        self.A += np.outer(self.z, (x - gm*rho*xp))
+        self.b += r*rho*self.z 
+
+        # prepare for next iteration
+        self.old_rho = rho 
+
+    @property
+    def theta(self):
+        return np.dot(np.linalg.pinv(self.A), self.b)
+    
+
+
+class GTD(Algo):
+    pass
 
 class ETD(Algo):
-    def update(self, x, r, xp, alpha, gm, gm_p, lmbda, rho, interest):
-        self.e = rho*()
+    def __init__(self, n, **kwargs):
+        self.n = n 
+        self.theta = np.zeros(n)
+        self.reset()
+
+    def reset(self):
+        self.z = np.zeros(self.n)
+        self.F = 0
+        self.M = 0
+        self.old_rho = 0
+
+    def update(self, x, r, xp, alpha, gm, gm_p, lm, rho, interest):
+        delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        self.F = gm*self.old_rho*self.F + interest 
+        self.M = lm*interest + (1 - lm)*self.F 
+        self.z = rho*(x*self.M + gm*lm*self.z) 
+        self.theta += alpha*delta*self.z 
+
+        # prepare for next iteration
+        self.old_rho = rho 
