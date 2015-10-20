@@ -1,3 +1,4 @@
+import inspect
 import numpy as np 
 
 
@@ -13,7 +14,9 @@ class MetaAlgo(type):
 
         # Don't touch base classes
         if bases != (object,):
-            algo_registry['name'] = cls            
+            algo_registry[name] = cls
+            # store update parameters for each agent as a class attribute
+            cls.update_params = [i for i in inspect.signature(cls.update).parameters]  
         return cls 
 
     def __call__(cls, *args, **kwargs):
@@ -22,16 +25,21 @@ class MetaAlgo(type):
 
 
 class Algo(object, metaclass=MetaAlgo):
-    """Update the agent from the experience it received.
+    """Base class for algorithms."""
+    def __init__(self, *args, **kwargs):
+        pass
 
-    Args:
-        s: The state at the beginning of the transition.
-        a: The action performed in state `s`.
-        r: The reward, a result of the transition (`s`, `a`, `sp`).
-        sp: The new state, a result of action `a` in state `s`.
-        **params: Any additional parameters needed to make the update. 
-    """
-    pass
+    def update(self, s, a, r, sp, **params):
+        """ Update the agent from the experience it received.
+
+        Args:
+            s: The state at the beginning of the transition.
+            a: The action performed in state `s`.
+            r: The reward, a result of the transition (`s`, `a`, `sp`).
+            sp: The new state, a result of action `a` in state `s`.
+            **params: Any additional parameters needed to make the update. 
+        """
+        pass
 
 
 class TD(Algo):

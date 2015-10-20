@@ -13,7 +13,7 @@ class MetaEnvironment(type):
 
         # Don't touch base classes
         if bases != (object,):
-            environment_registry['name'] = cls
+            environment_registry[name] = cls
         return cls 
 
 
