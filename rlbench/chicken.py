@@ -1,21 +1,20 @@
 """
-A simple reinforcement learning environment, implementing something like the 
+A simple reinforcement learning environment, implementing something like the
 game of "chicken".
 """
-import numpy as np 
-from environment import Environment 
+import numpy as np
+from environment import Environment
 
 
 class Chicken(Environment):
     ACTIONS = {'advance': 0, 'return': 1}
     EPISODIC = False
     def __init__(self, length):
-        self.length = length
+        self.length = length-1
         self.s0 = 0
-        self._terminals = {length,}
         self.reset()
 
-    @property 
+    @property
     def states(self):
         return {s for s in range(self.length+1)}
 
@@ -29,13 +28,13 @@ class Chicken(Environment):
             else:
                 sp = self._state + 1
         elif action == 1:
-            sp = self.s0 
+            sp = self.s0
         else:
             raise Exception("Invalid action:", action)
         # compute reward and set next state
         r = self.rfunc(self.state, action, sp)
-        self._state = sp 
-        return r, sp 
+        self._state = sp
+        return r, sp
 
     def rfunc(self, s, a, sp):
         if s == self.length - 1 and a == self.ACTIONS['advance']:
@@ -56,7 +55,7 @@ class EpisodicChicken(Environment):
         self._terminals = {length,}
         self.reset()
 
-    @property 
+    @property
     def states(self):
         return {s for s in range(self.length+1)}
 
@@ -71,12 +70,12 @@ class EpisodicChicken(Environment):
             sp = self.state + 1
             r = self.rfunc(self.state, action, sp)
         elif action == 1:
-            sp = self.s0 
+            sp = self.s0
             r = self.rfunc(self.state, action, sp)
         else:
             raise Exception("Invalid action:", action)
-        self._state = sp 
-        return r, sp 
+        self._state = sp
+        return r, sp
 
     def rfunc(self, s, a, sp):
         if self.is_terminal(sp) and not self.is_terminal(s):
@@ -86,7 +85,7 @@ class EpisodicChicken(Environment):
 
     def is_terminal(self, s=None):
         if s is None:
-            s = self._state 
+            s = self._state
         return s == self.length
 
 

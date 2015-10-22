@@ -16,7 +16,9 @@ class MetaAlgo(type):
         if bases != (object,):
             algo_registry[name] = cls
             # store update parameters for each agent as a class attribute
-            cls.update_params = [i for i in inspect.signature(cls.update).parameters]  
+            common_params = ('self', 'x', 'a', 'r', 'xp')
+            parameters = inspect.signature(cls.update).parameters
+            cls.update_params = [i for i in parameters if i not in common_params]
         return cls 
 
     def __call__(cls, *args, **kwargs):
@@ -29,14 +31,13 @@ class Algo(object, metaclass=MetaAlgo):
     def __init__(self, *args, **kwargs):
         pass
 
-    def update(self, s, a, r, sp, **params):
+    def update(self, x, r, xp, **params):
         """ Update the agent from the experience it received.
 
         Args:
-            s: The state at the beginning of the transition.
-            a: The action performed in state `s`.
+            x: The state at the beginning of the transition.
             r: The reward, a result of the transition (`s`, `a`, `sp`).
-            sp: The new state, a result of action `a` in state `s`.
+            xp: The new state, a result of action `a` in state `s`.
             **params: Any additional parameters needed to make the update. 
         """
         pass

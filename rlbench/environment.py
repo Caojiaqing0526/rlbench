@@ -14,14 +14,14 @@ class MetaEnvironment(type):
         # Don't touch base classes
         if bases != (object,):
             environment_registry[name] = cls
-        return cls 
+        return cls
 
 
 class Environment(object, metaclass=MetaEnvironment):
     """Abstract base class for a discrete environment in the RL framework."""
     def __init__(self, *args, **kwargs):
         pass
-    
+
     def observe(self, s=None):
         """Get the available sensory information for a state (defaulting to the
         current state if none is specified).
@@ -31,7 +31,7 @@ class Environment(object, metaclass=MetaEnvironment):
         Returns:
             The observation associated with the state.
         """
-        return self.state 
+        raise NotImplementedError
 
     def do(self, action):
         """Execute an action in the environment.
@@ -41,10 +41,10 @@ class Environment(object, metaclass=MetaEnvironment):
 
         Returns:
             r (float): The resulting reward from taking `action`.
-            sp : The new environment state resulting from performing `action`. 
+            sp : The new environment state resulting from performing `action`.
         """
-        raise NotImplementedError 
-        
+        raise NotImplementedError
+
     def rfunc(self, s, a, sp):
         """Reward function.
 
@@ -61,19 +61,19 @@ class Environment(object, metaclass=MetaEnvironment):
             r (float): The reward from the transition (`s`, `a`, `sp`).
         """
         raise NotImplementedError
-    
+
     def reset(self, s0=None):
         """Reset the environment.
-        
+
         Args:
-            s0: State to set the environment to. Defaults to the state the 
+            s0: State to set the environment to. Defaults to the state the
                 environment was in at initialization.
         """
         if s0 is None:
             self._state = self.s0
         else:
             self._state = s0
-        
+
     def is_episodic(self):
         """Return `True` if the environment is episodic."""
         return self.EPISODIC == True
@@ -81,7 +81,7 @@ class Environment(object, metaclass=MetaEnvironment):
 
     def is_terminal(self, s=None):
         """Return `True` if the environment is in a terminal state.
-        
+
         Args:
             s: State to check for termination. Defaults to current state.
 
@@ -89,7 +89,7 @@ class Environment(object, metaclass=MetaEnvironment):
             True if state is terminal, False otherwise.
         """
         raise NotImplementedError
-    
+
     def get_actions(self, s=None):
         """Actions available in state `s` (defaults to current state).
 
@@ -97,7 +97,7 @@ class Environment(object, metaclass=MetaEnvironment):
             actions (set): the actions available in state `s`.
         """
         raise NotImplementedError
-        
+
     @property
     def state(self):
         """The current state of the environment."""
@@ -108,12 +108,17 @@ class Environment(object, metaclass=MetaEnvironment):
         """Set: The set of all states in the environment."""
         raise NotImplementedError
 
-    @property 
+    @property
+    def actions(self):
+        """The actions available in the current state."""
+        return self.get_actions()
+
+    @property
     def nonterminals(self):
         """Set: The set of nonterminal states of the environment."""
         return {s for s in self.states if not self.is_terminal(s)}
 
-    @property 
+    @property
     def terminals(self):
         """Set: The set of terminal states of the environment."""
         return {s for s in self.states if self.is_terminal(s)}
@@ -121,8 +126,8 @@ class Environment(object, metaclass=MetaEnvironment):
     @property
     def max_actions(self):
         """int: The maximum number of actions available over all states."""
-        return max(len(self.actions(s)) for s in self.states)
+        return max(len(self.get_actions(s)) for s in self.states)
 
-    @property 
+    @property
     def info(self):
         """Return summary information about the environment."""

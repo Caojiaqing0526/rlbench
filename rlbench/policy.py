@@ -5,7 +5,7 @@ TODO: Composing policies
 TODO: Options
 TODO: More generally parameterizable policies.
 """
-import numpy as np 
+import numpy as np
 from collections import defaultdict
 
 
@@ -15,7 +15,7 @@ class Policy:
 
     def choose(self, s, actions):
         """ Select an action from possible actions in response to state `s`.
-        
+
         Args:
             s: State to take action in.
             actions: The actions available to the agent in state `s`.
@@ -27,13 +27,12 @@ class Policy:
 
     def probabilities(self, s, actions):
         """ Return the probability of selecting each action in state `s`."""
-        raise NotImplementedError 
+        raise NotImplementedError
 
     @property
     def info(self):
         """Summary information about the environment."""
         return dict()
-    
 
 
 class RandomPolicy(Policy):
@@ -49,7 +48,7 @@ class RandomPolicy(Policy):
 
 
 class FixedPolicy(Policy):
-    """ A policy which selects actions according to a fixed distribution for 
+    """ A policy which selects actions according to a fixed distribution for
     each state.
     """
     # TODO: Rename this
@@ -61,7 +60,7 @@ class FixedPolicy(Policy):
             self.pol[s] = defaultdict(int)
             for a, p in actions.items():
                 # TODO: check that probabilities sum to one
-                self.pol[s][a] = p 
+                self.pol[s][a] = p
 
     def choose(self, s, actions):
         return np.random.choice(actions, p=[self.pol[s][a] for a in actions])
@@ -75,10 +74,10 @@ class ObliviousPolicy(Policy):
     or if none of its preferred actions are available, selects a random action.
     """
     def __init__(self, preferences):
-        """ 
-        Initialize the policy. 
+        """
+        Initialize the policy.
 
-        Args: 
+        Args:
             preferences: An list of actions, in order of preference.
         """
         # check that preferences are well formed
@@ -87,6 +86,6 @@ class ObliviousPolicy(Policy):
     def choose(self, s, actions):
         for p in self.preferences:
             if p in actions:
-                return p 
+                return p
         else:
             return np.random.choice(actions)
