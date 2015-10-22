@@ -75,35 +75,6 @@ def stepwise_return(lst, gamma):
     return list(reversed(ret))
 
 
-def slow_stepwise_return(lst, gamma):
-    """The naive way of computing stepwise returns."""
-    # convert gamma to a state-dependent parameter
-    gamma = to_parameter(gamma)
-    rewards = np.array(get_rewards(lst))
-    gmlst = np.array(get_gammas(lst, gamma))
-    n = len(lst)
-    ret = []
-    for i in range(n):
-        ret.append(sum(rewards[j]*np.prod(gmlst[i:j]) for j in range(i, n)))
-    return ret
-
-
-def faster_stepwise_return(lst, gamma):
-    """Compute the return at each step in a trajectory. Slightly smarter."""
-    # convert gamma to a state-dependent parameter
-    gamma = to_parameter(gamma)
-    rewards = get_rewards(lst)
-    gmlst = get_gammas(lst, gamma)
-    n = len(lst)
-    ret = np.zeros(n)
-    ra = np.zeros(n)
-    for i in range(n-1, -1, -1):
-        ra *= gmlst.pop()
-        ra[i] = rewards.pop()
-        ret[i] = np.sum(ra)
-    return ret
-
-
 def every_visit_mc(lst, gamma):
     # compute the returns at each step
     glst = stepwise_return(lst, gamma)

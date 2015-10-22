@@ -5,6 +5,7 @@
 
 ## Testbeds 
 
+- [ ] **Random number generation should be seed-able!**
 - [ ] Chicken
 - [ ] Gridworld
 - [ ] Mountain Car

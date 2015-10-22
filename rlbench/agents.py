@@ -84,13 +84,24 @@ class OffPolicyAgent:
         """
         return self.algo.theta
 
+    def predict(self, s):
+        """Compute/predict the value for state `s`."""
+        return np.dot(self.theta, self.phi(s))
+
     def get_values(self, states):
         """Compute the values for each of the given states."""
-        return {s: np.dot(self.phi(s), self.theta) for s in states}
+        return {s: np.dot(self.theta, self.phi(s)) for s in states}
 
     def reset(self):
         """Call the learning algorithm's reset method."""
         self.algo.reset()
+
+
+class HordeOffPolicy:
+    """Off-policy evaluation with multiple concurrent agents."""
+    def __init__(self, agents, target, behavior):
+        pass
+
 
 
 class ScrapAgent:
