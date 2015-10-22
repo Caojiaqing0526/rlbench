@@ -1,8 +1,8 @@
 import inspect
-import numpy as np 
+import numpy as np
 
 
-# Provide a registry of available algorithms 
+# Provide a registry of available algorithms
 algo_registry = {}
 
 
@@ -19,7 +19,7 @@ class MetaAlgo(type):
             common_params = ('self', 'x', 'a', 'r', 'xp')
             parameters = inspect.signature(cls.update).parameters
             cls.update_params = [i for i in parameters if i not in common_params]
-        return cls 
+        return cls
 
     def __call__(cls, *args, **kwargs):
         """ Make any changes necessary upon initialization."""
@@ -38,7 +38,7 @@ class Algo(object, metaclass=MetaAlgo):
             x: The state at the beginning of the transition.
             r: The reward, a result of the transition (`s`, `a`, `sp`).
             xp: The new state, a result of action `a` in state `s`.
-            **params: Any additional parameters needed to make the update. 
+            **params: Any additional parameters needed to make the update.
         """
         pass
 
@@ -46,7 +46,7 @@ class Algo(object, metaclass=MetaAlgo):
 class TD(Algo):
     def __init__(self, n, **kwargs):
         # TODO: Documentation
-        self.n = n 
+        self.n = n
         self.theta = np.zeros(n)
         self.reset()
 
@@ -56,21 +56,21 @@ class TD(Algo):
 
     def update(self, x, r, xp, alpha, gm, lm, rho):
         # TODO: Documentation
-        # TODO: Compare updates from Geist 2014 vs. Precup, Sutton, & Singh 2000 
+        # TODO: Compare updates from Geist 2014 vs. Precup, Sutton, & Singh 2000
         self.z = x + gm*lm*self.old_rho*self.z
         delta = r + gm*rho*np.dot(self.theta, xp) - np.dot(self.theta, x)
-        self.theta += alpha*delta*self.z 
+        self.theta += alpha*delta*self.z
 
         # prepare for next iteration
         self.old_rho = rho
-        
+
 
 class LSTD(Algo):
     def __init__(self, n, epsilon=1e-6, **kwargs):
         self.n  = n                         # number of features
-        self.z  = np.zeros(n)               # traces 
+        self.z  = np.zeros(n)               # traces
         self.A  = np.eye(n,n) * epsilon     # A^-1 . b = theta^*
-        self.b  = np.zeros(n) 
+        self.b  = np.zeros(n)
         self.reset()
 
     def reset(self):
@@ -78,17 +78,17 @@ class LSTD(Algo):
         self.old_rho = 0
 
     def update(self, x, r, xp, gm, lm, rho):
-        self.z = x + gm*lm*self.old_rho*self.z 
+        self.z = x + gm*lm*self.old_rho*self.z
         self.A += np.outer(self.z, (x - gm*rho*xp))
-        self.b += r*rho*self.z 
+        self.b += r*rho*self.z
 
         # prepare for next iteration
-        self.old_rho = rho 
+        self.old_rho = rho
 
     @property
     def theta(self):
         return np.dot(np.linalg.pinv(self.A), self.b)
-    
+
 
 
 class GTD(Algo):
@@ -96,7 +96,7 @@ class GTD(Algo):
 
 class ETD(Algo):
     def __init__(self, n, **kwargs):
-        self.n = n 
+        self.n = n
         self.theta = np.zeros(n)
         self.reset()
 
@@ -108,10 +108,10 @@ class ETD(Algo):
 
     def update(self, x, r, xp, alpha, gm, gm_p, lm, rho, interest):
         delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
-        self.F = gm*self.old_rho*self.F + interest 
-        self.M = lm*interest + (1 - lm)*self.F 
-        self.z = rho*(x*self.M + gm*lm*self.z) 
-        self.theta += alpha*delta*self.z 
+        self.F = gm*self.old_rho*self.F + interest
+        self.M = lm*interest + (1 - lm)*self.F
+        self.z = rho*(x*self.M + gm*lm*self.z)
+        self.theta += alpha*delta*self.z
 
         # prepare for next iteration
-        self.old_rho = rho 
+        self.old_rho = rho

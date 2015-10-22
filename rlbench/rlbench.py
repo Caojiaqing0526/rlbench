@@ -7,6 +7,32 @@ from collections import defaultdict
 from parametric import to_parameter
 
 
+def run_episode(agent, env, max_steps=None):
+    """Run an episode in a policy evaluation experiment."""
+    ret = []
+    t = 0
+
+    # reset the environment and get initial state
+    env.reset()
+    s = env.state
+    while not env.is_terminal() and t < max_steps:
+        actions = env.actions
+        a = agent.choose(s, actions)
+        r, sp = env.do(a)
+        agent.update(s, r, sp)
+
+        # log information about the episode
+        ret.append((s, a, r, sp))
+
+        # prepare for next iteration
+        t += 1
+        s = sp
+    return ret
+
+################################################################################
+# Data Analysis functions
+################################################################################
+
 def get_rewards(lst):
     # lst = [(s1, a1, r2, s2), (s2, a2, r3, s3), ...]
     return [i[2] for i in lst]
@@ -29,6 +55,28 @@ def stepwise_params(lst, param):
     return [param(s) for s in get_states(lst)]
 
 def stepwise_return(lst, gamma):
+    """Compute the return at each step in a trajectory.
+
+    Uses the fact that the return at each step 'backwards' from the end of the
+    trajectory is the immediate reward plus the discounted return from the next
+    state.
+    """
+    # convert gamma to a state-dependent parameter
+    gamma = to_parameter(gamma)
+    rewards = get_rewards(lst)
+    gmlst = get_gammas(lst, gamma)
+    n = len(lst)
+    ret = []
+    tmp = 0
+    for r, gm in reversed(list(zip(rewards, gmlst))):
+        tmp *= gm
+        tmp += r
+        ret.append(tmp)
+    return list(reversed(ret))
+
+
+def slow_stepwise_return(lst, gamma):
+    """The naive way of computing stepwise returns."""
     # convert gamma to a state-dependent parameter
     gamma = to_parameter(gamma)
     rewards = np.array(get_rewards(lst))
@@ -36,20 +84,43 @@ def stepwise_return(lst, gamma):
     n = len(lst)
     ret = []
     for i in range(n):
-        # TODO: This seems inefficient, but I'm unsure how to improve it
         ret.append(sum(rewards[j]*np.prod(gmlst[i:j]) for j in range(i, n)))
     return ret
+
+
+def faster_stepwise_return(lst, gamma):
+    """Compute the return at each step in a trajectory. Slightly smarter."""
+    # convert gamma to a state-dependent parameter
+    gamma = to_parameter(gamma)
+    rewards = get_rewards(lst)
+    gmlst = get_gammas(lst, gamma)
+    n = len(lst)
+    ret = np.zeros(n)
+    ra = np.zeros(n)
+    for i in range(n-1, -1, -1):
+        ra *= gmlst.pop()
+        ra[i] = rewards.pop()
+        ret[i] = np.sum(ra)
+    return ret
+
 
 def every_visit_mc(lst, gamma):
     # compute the returns at each step
     glst = stepwise_return(lst, gamma)
     # group returns by state
     dct = defaultdict(list)
-    for x, g in zip(lst, retlst):
+    for x, g in zip(lst, glst):
         s, a, r, sp = x
-        dct[x].append(g)
+        dct[s].append(g)
 
-    return
+    # output the averaged returns for each state
+    return {k: np.mean(v) for k, v in dct.items()}
 
 def phi_matrix(states, phi):
     return np.array([phi(s) for s in states])
+
+def get_features(states, phi):
+    return {s: phi(s) for s in states}
+
+def get_values(states, phi, theta):
+    return {s: np.dot(phi(s), theta) for s in states}

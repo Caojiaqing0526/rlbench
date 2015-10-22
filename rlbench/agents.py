@@ -6,11 +6,11 @@ parameters, feature function, and potentially the target and behavior policies
 into a single object.
 """
 import numpy as np
-
+import parametric
 
 class OffPolicyAgent:
     """An agent designed for off-policy experiments."""
-    def __init__(self, algo, target, behavior, phi=None, param_funcs=dict()):
+    def __init__(self, algo, target, behavior, phi=None, update_params=dict()):
         self.algo = algo
         self.target = target
         self.behavior = behavior
@@ -83,6 +83,10 @@ class OffPolicyAgent:
         function approximation.
         """
         return self.algo.theta
+
+    def get_values(self, states):
+        """Compute the values for each of the given states."""
+        return {s: np.dot(self.phi(s), self.theta) for s in states}
 
     def reset(self):
         """Call the learning algorithm's reset method."""

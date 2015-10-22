@@ -23,7 +23,7 @@ class Chicken(Environment):
 
     def do(self, action):
         if action == 0:
-            if self._state == self.length - 1:
+            if self._state == self.length:
                 sp = self.s0
             else:
                 sp = self._state + 1
@@ -37,7 +37,7 @@ class Chicken(Environment):
         return r, sp
 
     def rfunc(self, s, a, sp):
-        if s == self.length - 1 and a == self.ACTIONS['advance']:
+        if s == self.length and a == self.ACTIONS['advance']:
             return 1
         else:
             return 0
