@@ -40,8 +40,21 @@ class Constant(Parameter):
 
 class Map(UserDict, Parameter):
     """A function that maps keys to values, essentially like a dictionary."""
-    def __call__(self, key) -> float:
+    def __call__(self, key, *args) -> float:
         return self[key]
+
+
+class MapState(UserDict, Parameter):
+    def __call__(self, s, a, sp) -> float:
+        return self[s]
+
+
+class MapNextState(UserDict, Parameter):
+    """A function that maps keys to values like a dictionary, but acts on the
+    *subsequent* state, (that is, s' in the transition (s, a, s')).
+    """
+    def __call__(self, s, a, sp):
+        return self[sp]
 
 
 class FirstVisit(Parameter):
@@ -52,7 +65,7 @@ class FirstVisit(Parameter):
         self.val_dct = {k:v for k, v in val_dct.items()}
         self.unseen = {k: True for k in val_dct.keys()}
 
-    def __call__(self, key) -> float:
+    def __call__(self, key, *args) -> float:
         if (key in self.val_dct and self.unseen[key]):
             self.unseen[key] = False
             return self.val_dct[key]

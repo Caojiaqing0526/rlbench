@@ -91,10 +91,8 @@ class LSTD(Algo):
 
 
 
-class GTD(Algo):
-    pass
-
 class ETD(Algo):
+    """Emphatic Temporal Difference Learning, or ETD(λ)."""
     def __init__(self, n, **kwargs):
         self.n = n
         self.theta = np.zeros(n)
@@ -115,3 +113,67 @@ class ETD(Algo):
 
         # prepare for next iteration
         self.old_rho = rho
+
+
+class GTD(Algo):
+    """GTD -- Gradient Temporal Difference Learning, minimizing NEU.
+
+    TODO: Is there a version of this that admits eligibility traces?
+    TODO: Check this for GVF indexing accuracy
+    """
+    def __init__(self, n, **kwargs):
+        self.n = n 
+        self.theta = np.zeros(n)
+        self.w = np.zeros(n)
+        self.reset()
+
+    def reset(self):
+        self.z = np.zeros(self.n)
+
+    def update(self, x, r, xp, alpha, beta, gm, gm_p, rho):
+        delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        self.theta += alpha*rho*(x - gm_p*xp)*np.dot(x, self.w)
+        self.w += beta*rho*(delta*x - self.w)
+
+
+class GTD2(Algo):
+    """GTD2 -- Gradient Temporal Difference Learning, which minimizes MSPBE.
+
+    TODO: Is there a version of this that admits eligibility traces?
+    TODO: Check this for GVF indexing accuracy
+    """
+    def __init__(self, n, **kwargs):
+        self.n = n 
+        self.theta = np.zeros(n)
+        self.w = np.zeros(n)
+        self.reset()
+
+    def reset(self):
+        self.z = np.zeros(self.n)
+
+    def update(self, x, r, xp, alpha, beta, gm, gm_p, rho):
+        delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        self.theta += alpha*rho*(x - gm_p*xp)*np.dot(x, self.w)
+        self.w += beta*(rho*delta - np.dot(x, self.w))*x 
+
+
+class TDC(Algo):
+    """The Temporal Difference with Gradient Correction, AKA TDC(λ), AKA GTD(λ).
+    
+    See page 74 and 91-92 of Maei's thesis for definition of the algorithm.
+    TODO: is there an error in the `w` update? Should it include `rho`?
+    """
+    def __init__(self, n, **kwargs):
+        self.n = n 
+        self.theta = np.zeros(n)
+        self.w = np.zeros(n)
+        self.reset()
+
+    def reset(self):
+        self.z = np.zeros(self.n)
+
+    def update(self, x, r, xp, alpha, beta, gm, gm_p, lm, lm_p, rho):
+        delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
+        self.z = rho*(x + gm*lm*self.z)
+        self.theta += alpha*(delta*self.z - gm_p*(1-lm_p)*np.dot(self.z, self.w)*xp)
+        self.w += beta*(delta*self.z - np.dot(x, self.w)*x)

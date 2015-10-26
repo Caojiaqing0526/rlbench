@@ -7,7 +7,7 @@ from collections import defaultdict
 from parametric import to_parameter
 
 
-def run_episode(agent, env, max_steps=None):
+def run_episode(agent, env, max_steps):
     """Run an episode in a policy evaluation experiment."""
     ret = []
     t = 0
@@ -16,17 +16,119 @@ def run_episode(agent, env, max_steps=None):
     env.reset()
     s = env.state
     while not env.is_terminal() and t < max_steps:
+        # choose an action, take it, and observe the result
         actions = env.actions
         a = agent.choose(s, actions)
         r, sp = env.do(a)
+
+        # update the agent 
         agent.update(s, r, sp)
 
-        # log information about the episode
+        # record the transition
         ret.append((s, a, r, sp))
 
         # prepare for next iteration
         t += 1
         s = sp
+    return ret
+
+
+def run_errors(agent, env, max_steps, val_dct):
+    """Run an episode in a policy evaluation experiment, recording the agent's
+    RMSE vs. known state values. 
+    """
+    ret = []
+    t = 0
+
+    # record/precompute information about the environment
+    states = env.states 
+    features = {s: agent.phi(s) for s in states}
+    target_values = np.array([val_dct[s] for s in states])
+
+    # reset the environment and get initial state
+    env.reset()
+    s = env.state
+    while not env.is_terminal() and t < max_steps:
+        # choose an action, take it, and observe the result
+        actions = env.actions
+        a = agent.choose(s, actions)
+        r, sp = env.do(a)
+
+        # update the agent 
+        agent.update(s, r, sp)
+
+        # get the agent's state values and compare with the target values
+        theta = agent.theta 
+        values = np.array([np.dot(theta, features[s]) for s in states])
+        difference = target_values - values 
+        error = np.sqrt(np.mean(difference**2))
+
+        # record the transition
+        ret.append(error)
+
+        # prepare for next iteration
+        t += 1
+        s = sp
+    return ret
+
+
+def run_policy(pol, env, max_steps, param_funcs=dict()):
+    """Run a policy in an environment for a specified number of steps."""
+    ret = []
+    t = 0
+
+    # reset the environment and get initial state
+    env.reset()
+    s = env.state
+    while not env.is_terminal() and t < max_steps:
+        # choose and take action according to the policy, observe result
+        actions = env.actions
+        a = pol.choose(s, actions)
+        r, sp = env.do(a)
+
+        # record the transition
+        ret.append((s, a, r, sp))
+
+        # prepare for next iteration
+        s = sp
+        t += 1
+    return ret
+
+def run_policy_verbose(pol, env, max_steps, param_funcs=dict()):
+    """Run a policy in an environment for a specified number of steps.
+
+    Provide enough information to run the online algorithms offline by recording
+    each step's entire context, potentially including the values of parameter
+    functions at each point in time.
+    """
+    ret = []
+    t = 0
+
+    # convert parameter functions to `Parameter` type, if needed
+    param_funcs = {k: to_parameter(v) for k, v in param_funcs.items()}
+
+    # reset the environment and get initial state
+    env.reset()
+    s = env.state
+    while not env.is_terminal() and t < max_steps:
+        # record the context of the time step
+        actions = env.actions
+        a = pol.choose(s, actions)
+        r, sp = env.do(a)
+
+        # record the transition information
+        ctx = {'s': s, 'a': a, 'r': r, 'sp': sp, 'actions': actions}
+        
+        # record values of parameters for the transition
+        for name, func in param_funcs.items():
+            ctx[name] = func(s, a, sp)
+
+        # log the context of the transition
+        ret.append(ctx)
+
+        # prepare for next iteration
+        s = sp
+        t += 1
     return ret
 
 ################################################################################
