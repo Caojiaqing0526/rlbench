@@ -21,8 +21,8 @@ def run_episode(agent, env, max_steps):
         a = agent.choose(s, actions)
         r, sp = env.do(a)
 
-        # update the agent 
-        agent.update(s, r, sp)
+        # update the agent
+        agent.update(s, a, r, sp)
 
         # record the transition
         ret.append((s, a, r, sp))
@@ -35,13 +35,13 @@ def run_episode(agent, env, max_steps):
 
 def run_errors(agent, env, max_steps, val_dct):
     """Run an episode in a policy evaluation experiment, recording the agent's
-    RMSE vs. known state values. 
+    RMSE vs. known state values.
     """
     ret = []
     t = 0
 
     # record/precompute information about the environment
-    states = env.states 
+    states = env.states
     features = {s: agent.phi(s) for s in states}
     target_values = np.array([val_dct[s] for s in states])
 
@@ -54,13 +54,13 @@ def run_errors(agent, env, max_steps, val_dct):
         a = agent.choose(s, actions)
         r, sp = env.do(a)
 
-        # update the agent 
-        agent.update(s, r, sp)
+        # update the agent
+        agent.update(s, a, r, sp)
 
         # get the agent's state values and compare with the target values
-        theta = agent.theta 
+        theta = agent.theta
         values = np.array([np.dot(theta, features[s]) for s in states])
-        difference = target_values - values 
+        difference = target_values - values
         error = np.sqrt(np.mean(difference**2))
 
         # record the transition
@@ -118,7 +118,7 @@ def run_policy_verbose(pol, env, max_steps, param_funcs=dict()):
 
         # record the transition information
         ctx = {'s': s, 'a': a, 'r': r, 'sp': sp, 'actions': actions}
-        
+
         # record values of parameters for the transition
         for name, func in param_funcs.items():
             ctx[name] = func(s, a, sp)

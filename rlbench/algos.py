@@ -122,7 +122,7 @@ class GTD(Algo):
     TODO: Check this for GVF indexing accuracy
     """
     def __init__(self, n, **kwargs):
-        self.n = n 
+        self.n = n
         self.theta = np.zeros(n)
         self.w = np.zeros(n)
         self.reset()
@@ -143,7 +143,7 @@ class GTD2(Algo):
     TODO: Check this for GVF indexing accuracy
     """
     def __init__(self, n, **kwargs):
-        self.n = n 
+        self.n = n
         self.theta = np.zeros(n)
         self.w = np.zeros(n)
         self.reset()
@@ -154,17 +154,17 @@ class GTD2(Algo):
     def update(self, x, r, xp, alpha, beta, gm, gm_p, rho):
         delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
         self.theta += alpha*rho*(x - gm_p*xp)*np.dot(x, self.w)
-        self.w += beta*(rho*delta - np.dot(x, self.w))*x 
+        self.w += beta*(rho*delta - np.dot(x, self.w))*x
 
 
 class TDC(Algo):
     """The Temporal Difference with Gradient Correction, AKA TDC(λ), AKA GTD(λ).
-    
+
     See page 74 and 91-92 of Maei's thesis for definition of the algorithm.
     TODO: is there an error in the `w` update? Should it include `rho`?
     """
     def __init__(self, n, **kwargs):
-        self.n = n 
+        self.n = n
         self.theta = np.zeros(n)
         self.w = np.zeros(n)
         self.reset()

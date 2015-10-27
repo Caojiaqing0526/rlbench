@@ -29,7 +29,7 @@ class OnPolicyAgent:
         self.rho = 1
 
     def choose(self, s, actions):
-        """ Select an action from possible actions in response to state `s`, 
+        """ Select an action from possible actions in response to state `s`,
         according to the specified policy.
 
         Args:
@@ -43,7 +43,7 @@ class OnPolicyAgent:
         action = self.behavior.choose(s, actions)
         return action
 
-    def update(self, s, r, sp, **params):
+    def update(self, s, a, r, sp, **params):
         """ Update the agent from the experience it received.
 
         Uses `self.rho` which will be accurate if the agent's `choose` method
@@ -87,7 +87,8 @@ class OnPolicyAgent:
 
     def get_values(self, states):
         """Compute the values for each of the given states."""
-        return {s: np.dot(self.theta, self.phi(s)) for s in states}
+        theta = self.theta
+        return {s: np.dot(theta, self.phi(s)) for s in states}
 
     def reset(self):
         """Call the learning algorithm's reset method."""
@@ -132,7 +133,7 @@ class OffPolicyAgent:
         self.rho = prob_pi[action]/prob_mu[action]
         return action
 
-    def update(self, s, r, sp, **params):
+    def update(self, s, a, r, sp, **params):
         """ Update the agent from the experience it received.
 
         Uses `self.rho` which will be accurate if the agent's `choose` method
@@ -176,17 +177,49 @@ class OffPolicyAgent:
 
     def get_values(self, states):
         """Compute the values for each of the given states."""
-        return {s: np.dot(self.theta, self.phi(s)) for s in states}
+        theta = self.theta
+        return {s: np.dot(theta, self.phi(s)) for s in states}
 
     def reset(self):
         """Call the learning algorithm's reset method."""
         self.algo.reset()
 
 
-class HordeOffPolicy:
-    """Off-policy evaluation with multiple concurrent agents."""
-    def __init__(self, agents, target, behavior):
-        pass
+class HordeAgent:
+    def __init__(self, algo, pol, phi, update_params=dict()):
+        self.algo = algo
+        self.pol = pol
+        if phi is None:
+            self.phi = lambda x: x
+        else:
+            self.phi = phi
+        # default parameter functions to use for updates
+        self.param_funcs = {k: parametric.to_parameter(v)
+                            for k, v in update_params.items()}
+
+    def update(self, s, a, r, sp, **params):
+        # determine the state dependent update params
+        update_params = {k: v(s) for k, v in self.param_funcs.items()}
+        # compute the action selection probability ratio
+        update_params['rho'] = self.pol.prob(s, a)
+        update_params.update(**params)
+        # get the arguments to pass to the function
+        args = [update_params[k] for k in self.algo.update_params]
+
+        # function approximation
+        x = self.phi(s)
+        xp = self.phi(sp)
+
+        return self.algo.update(x, r, xp, *args)
+
+    @property
+    def theta(self):
+        return self.algo.theta
+
+    def get_values(self, states):
+        """Compute the values for each of the given states."""
+        theta = self.theta
+        return {s: np.dot(theta, self.phi(s)) for s in states}
 
 
 class ScrapAgent:

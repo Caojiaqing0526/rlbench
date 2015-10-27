@@ -25,9 +25,14 @@ class Policy:
         """
         raise NotImplementedError
 
+    def prob(self, s, a):
+        """The probability of selecting action `a` in state `s`."""
+        raise NotImplementedError
+
     def probabilities(self, s, actions):
         """ Return the probability of selecting each action in state `s`."""
         raise NotImplementedError
+
 
     @property
     def info(self):
@@ -51,7 +56,6 @@ class FixedPolicy(Policy):
     """ A policy which selects actions according to a fixed distribution for
     each state.
     """
-    # TODO: Rename this
     def __init__(self, dct):
         # define the policy from the supplied dictionary
         self.pol = dict()
@@ -64,6 +68,9 @@ class FixedPolicy(Policy):
 
     def choose(self, s, actions):
         return np.random.choice(actions, p=[self.pol[s][a] for a in actions])
+
+    def prob(self, s, a):
+        return self.pol[s][a]
 
     def probabilities(self, s, actions):
         return [self.pol[s][a] for a in actions]
