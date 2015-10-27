@@ -32,6 +32,33 @@ def run_episode(agent, env, max_steps):
         s = sp
     return ret
 
+def run_many(agent_lst, behavior, env, max_steps):
+    steps = []
+    error_dct = {}
+    t = 0
+
+    # reset the environment and get initial state
+    env.reset()
+    s = env.state
+    while not env.is_terminal() and t < max_steps:
+        a = behavior.choose(s, env.actions)
+        r, sp = env.do(a)
+
+        # update the agents
+        for agent in agent_lst:
+            delta = agent.update(s, a, r, sp)
+
+        # record the transition
+        ret.append((s, a, r, sp))
+
+        # prepare for next iteration
+        t += 1
+        s = sp
+
+    # return information about the run
+    ret = {}
+    return ret
+
 
 def run_errors(agent, env, max_steps, val_dct):
     """Run an episode in a policy evaluation experiment, recording the agent's
