@@ -7,6 +7,7 @@ algo_registry = {}
 
 
 class MetaAlgo(type):
+    # TODO: Documentation
     def __new__(meta, name, bases, attrs):
         """Perform actions/make changes upon class definition."""
         # Create the class object
@@ -27,6 +28,7 @@ class MetaAlgo(type):
 
 
 class Algo(object, metaclass=MetaAlgo):
+    # TODO: Documentation
     """Base class for algorithms."""
     def __init__(self, *args, **kwargs):
         pass
@@ -129,6 +131,7 @@ class GTD(Algo):
 
     def reset(self):
         self.z = np.zeros(self.n)
+        self.w = np.zeros(self.n)
 
     def update(self, x, r, xp, alpha, beta, gm, gm_p, rho):
         delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
@@ -150,6 +153,7 @@ class GTD2(Algo):
 
     def reset(self):
         self.z = np.zeros(self.n)
+        self.w = np.zeros(self.n)
 
     def update(self, x, r, xp, alpha, beta, gm, gm_p, rho):
         delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)
@@ -171,6 +175,7 @@ class TDC(Algo):
 
     def reset(self):
         self.z = np.zeros(self.n)
+        self.w = np.zeros(self.n)
 
     def update(self, x, r, xp, alpha, beta, gm, gm_p, lm, lm_p, rho):
         delta = r + gm_p*np.dot(self.theta, xp) - np.dot(self.theta, x)

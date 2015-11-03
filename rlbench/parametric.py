@@ -13,7 +13,7 @@ def to_parameter(x):
     elif isinstance(x, numbers.Number):
         return Constant(x)
     elif isinstance(x, dict):
-        return Map(x)
+        return MapState(x)
     else:
         raise TypeError("Unable to represent as a parameter:", x)
 
@@ -38,14 +38,13 @@ class Constant(Parameter):
         return self.value
 
 
-class Map(UserDict, Parameter):
-    """A function that maps keys to values, essentially like a dictionary."""
-    def __call__(self, key, *args) -> float:
-        return self[key]
-
-
 class MapState(UserDict, Parameter):
-    def __call__(self, s, a, sp) -> float:
+    """A function that maps keys to values, essentially like a dictionary, 
+    acting on the current state, `s`."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+    def __call__(self, s, a=None, sp=None) -> float:
         return self[s]
 
 

@@ -59,7 +59,7 @@ class OnPolicyAgent:
         agent's initialization, and are assumed to be numeric, not callables.
         """
         # determine the state dependent update params
-        update_params = {k: v(s) for k, v in self.param_funcs.items()}
+        update_params = {k: v(s, a, sp) for k, v in self.param_funcs.items()}
         # specify rho from previous invocation of `choice`
         update_params['rho'] = self.rho
         # override parameter values as necessary
@@ -149,7 +149,7 @@ class OffPolicyAgent:
         agent's initialization, and are assumed to be numeric, not callables.
         """
         # determine the state dependent update params
-        update_params = {k: v(s) for k, v in self.param_funcs.items()}
+        update_params = {k: v(s, a, sp) for k, v in self.param_funcs.items()}
         # specify rho from previous invocation of `choice`
         update_params['rho'] = self.rho
         # override parameter values as necessary
@@ -199,7 +199,7 @@ class HordeAgent:
 
     def update(self, s, a, r, sp, **params):
         # determine the state dependent update params
-        update_params = {k: v(s) for k, v in self.param_funcs.items()}
+        update_params = {k: v(s, a, sp) for k, v in self.param_funcs.items()}
         # compute the action selection probability ratio
         update_params['rho'] = self.pol.prob(s, a)
         update_params.update(**params)
@@ -220,6 +220,9 @@ class HordeAgent:
         """Compute the values for each of the given states."""
         theta = self.theta
         return {s: np.dot(theta, self.phi(s)) for s in states}
+
+    def reset(self):
+        self.algo.reset()
 
 
 class ScrapAgent:

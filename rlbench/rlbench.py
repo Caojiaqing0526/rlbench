@@ -49,14 +49,14 @@ def run_many(agent_lst, behavior, env, max_steps):
             delta = agent.update(s, a, r, sp)
 
         # record the transition
-        ret.append((s, a, r, sp))
+        steps.append((s, a, r, sp))
 
         # prepare for next iteration
         t += 1
         s = sp
 
     # return information about the run
-    ret = {}
+    ret = {'steps': steps}
     return ret
 
 
@@ -224,3 +224,6 @@ def get_features(states, phi):
 
 def get_values(states, phi, theta):
     return {s: np.dot(phi(s), theta) for s in states}
+
+def dct2vec(dct):
+    return np.array([dct[k] for k in sorted(dct.keys())])
