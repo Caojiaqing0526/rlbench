@@ -56,7 +56,7 @@ class TD(Algo):
         self.z = np.zeros(self.n)
         self.old_rho = 0
 
-    def update(self, x, r, xp, alpha, gm, lm, rho):
+    def update(self, x, r, xp, alpha, gm, gm_p, lm, rho):
         # TODO: Documentation
         # TODO: Compare updates from Geist 2014 vs. Precup, Sutton, & Singh 2000
         self.z = x + gm*lm*self.old_rho*self.z
@@ -79,9 +79,9 @@ class LSTD(Algo):
         self.z = np.zeros(self.n)
         self.old_rho = 0
 
-    def update(self, x, r, xp, gm, lm, rho):
+    def update(self, x, r, xp, gm, gm_p, lm, rho):
         self.z = x + gm*lm*self.old_rho*self.z
-        self.A += np.outer(self.z, (x - gm*rho*xp))
+        self.A += np.outer(self.z, (x - gm_p*rho*xp))
         self.b += r*rho*self.z
 
         # prepare for next iteration

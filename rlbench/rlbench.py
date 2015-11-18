@@ -227,3 +227,28 @@ def get_values(states, phi, theta):
 
 def dct2vec(dct):
     return np.array([dct[k] for k in sorted(dct.keys())])
+
+
+################################################################################
+# Error Analysis
+################################################################################
+
+def rmse_error_dct(theta, features, values, weights=None):
+    """Root mean-square error for linear function approximation.
+
+    Assumes `features`, `values` and `weights` are dictionaries mapping states
+    to the appropriate value.
+    """
+    states = list(features.keys())
+    diff = []
+    for s in states:
+        v = values[s] # true value
+        x = features[s]
+        w = weights.get(s, 1)
+
+        # calculate value difference under function approximation
+        diff.append(w * (v - np.dot(theta, x)))
+    # calculate the error
+    diff = np.array(diff)
+    err = np.sqrt(np.mean(diff**2))
+    return err

@@ -164,6 +164,39 @@ class OffPolicyAgent:
         # update
         self.algo.update(x, r, xp, *args)
 
+    def get_context(self, s, a, r, sp, **params):
+        """Get the `context` for the current step, i.e., all information
+        necessary to update the algorithm at this time.
+        """
+        ret = dict()
+        # default state-dependent parameter functions
+        update_params = {k: v(s, a, sp) for k, v in self.param_funcs.items()}
+        # `rho` is determined from previous selection of `choice()`
+        update_params['rho'] = self.rho
+        # override parameter values as needed
+        update_params.update(**params)
+
+        # function approximation
+        x = self.phi(s)
+        xp = self.phi(sp)
+
+        # add `update_params` to context
+        ret.update(**update_params)
+
+        # record information about the timestep
+        ret['s'] = s
+        ret['a'] = a
+        ret['r'] = r
+        ret['sp'] = sp
+        ret['x'] = x
+        ret['xp'] = xp
+
+        # get internal information from the algorithm
+        ret['theta'] = self.algo.theta.copy()
+        # return the timestep's context
+        return ret
+
+
     @property
     def theta(self):
         """Return the weight vector `theta` that the algorithm is using for
@@ -201,7 +234,7 @@ class HordeAgent:
         # determine the state dependent update params
         update_params = {k: v(s, a, sp) for k, v in self.param_funcs.items()}
         # compute the action selection probability ratio
-        update_params['rho'] = self.pol.prob(s, a)
+        update_params['rho'] = 1 #TODO: This is wrong
         update_params.update(**params)
         # get the arguments to pass to the function
         args = [update_params[k] for k in self.algo.update_params]
