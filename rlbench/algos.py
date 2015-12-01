@@ -49,10 +49,10 @@ class TD(Algo):
     def __init__(self, n, **kwargs):
         # TODO: Documentation
         self.n = n
-        self.theta = np.zeros(n)
         self.reset()
 
     def reset(self):
+        self.theta = np.zeros(n)
         self.z = np.zeros(self.n)
         self.old_rho = 0
 
@@ -70,13 +70,12 @@ class TD(Algo):
 class LSTD(Algo):
     def __init__(self, n, epsilon=1e-6, **kwargs):
         self.n  = n                         # number of features
-        self.z  = np.zeros(n)               # traces
-        self.A  = np.eye(n,n) * epsilon     # A^-1 . b = theta^*
-        self.b  = np.zeros(n)
         self.reset()
 
     def reset(self):
-        self.z = np.zeros(self.n)
+        self.z  = np.zeros(self.n)               # traces
+        self.A  = np.eye(self.n) * epsilon     # A^-1 . b = theta^*
+        self.b  = np.zeros(self.n)
         self.old_rho = 0
 
     def update(self, x, r, xp, gm, gm_p, lm, rho):
@@ -97,10 +96,10 @@ class ETD(Algo):
     """Emphatic Temporal Difference Learning, or ETD(λ)."""
     def __init__(self, n, **kwargs):
         self.n = n
-        self.theta = np.zeros(n)
         self.reset()
 
     def reset(self):
+        self.theta = np.zeros(self.n)
         self.z = np.zeros(self.n)
         self.F = 0
         self.M = 0
@@ -125,11 +124,10 @@ class GTD(Algo):
     """
     def __init__(self, n, **kwargs):
         self.n = n
-        self.theta = np.zeros(n)
-        self.w = np.zeros(n)
         self.reset()
 
     def reset(self):
+        self.theta = np.zeros(self.n)
         self.z = np.zeros(self.n)
         self.w = np.zeros(self.n)
 
@@ -147,11 +145,10 @@ class GTD2(Algo):
     """
     def __init__(self, n, **kwargs):
         self.n = n
-        self.theta = np.zeros(n)
-        self.w = np.zeros(n)
         self.reset()
 
     def reset(self):
+        self.theta = np.zeros(self.n)
         self.z = np.zeros(self.n)
         self.w = np.zeros(self.n)
 
@@ -169,11 +166,10 @@ class TDC(Algo):
     """
     def __init__(self, n, **kwargs):
         self.n = n
-        self.theta = np.zeros(n)
-        self.w = np.zeros(n)
         self.reset()
 
     def reset(self):
+        self.theta = np.zeros(self.n)
         self.z = np.zeros(self.n)
         self.w = np.zeros(self.n)
 
