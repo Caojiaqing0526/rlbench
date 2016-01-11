@@ -2,27 +2,23 @@ import numpy as np
 from numpy import diag, dot
 from numpy.linalg import pinv
 
-# Utility functions
+# Utility
 def normalize(array, axis=None):
+    """Normalize an array along an axis."""
+    def _normalize(vec):
+        return vec/np.sum(vec)
     if axis:
-        return np.apply_along_axis(lambda x: x/np.sum(x), axis, array)
+        return np.apply_along_axis(_normalize, axis, array)
     else:
-        return array/np.sum(array)
+        return _normalize(array)
 
-def stationary(mat):
-    """Compute the stationary distribution for transition matrix `mat`.
+def clip(array, tol=1e-6):
+    """Return `array` with values close to zero set to zero."""
+    ret = np.copy(array)
+    ret[np.abs(ret) < tol] = 0
+    return ret 
 
-    Assumes that `mat` is ergodic and irreducible, so there is only one
-    solution.
-    """
-    P = np.copy(mat.T) - np.eye(len(mat))
-    P[-1,:] = 1 # set last row (really column) to ones
-    b = np.zeros(len(mat))
-    b[-1] = 1
-    x = np.linalg.solve(P, b)
-    return normalize(x)
-
-def parameter_matrix(x):
+def as_op_matrix(x):
     """Convert scalar, vector, or matrix to operator matrix for state-dependent
     parameters.
     """
@@ -35,6 +31,21 @@ def parameter_matrix(x):
     else:
         raise ValueError("Invalid dimension for parameter:", np.ndim(x))
     return ret
+
+# MDPs
+def stationary(mat):
+    """Compute the stationary distribution for transition matrix `mat`, via 
+    c omputing the solution to the system of equations (P.T - I)*\pi = 0. 
+        
+    NB: Assumes `mat` is ergodic (aperiodic and irreducible).
+    Could do with LU factorization -- c.f. 54-14 in Handbook of Linear Algebra
+    """
+    P = (np.copy(mat).T - np.eye(len(mat)))
+    P[-1,:] = 1
+    b = np.zeros(len(mat))
+    b[-1] = 1
+    x = np.linalg.solve(P, b)
+    return normalize(x)
 
 def rmse(a, b, weight=None):
     if weight is None:
